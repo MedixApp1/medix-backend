@@ -7,6 +7,7 @@ import {
   WebSocketGateway,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
 } from '@nestjs/websockets';
 import { GoogleSpeechService } from 'src/common/utils/google-speech.service';
 
@@ -14,9 +15,8 @@ import { GoogleSpeechService } from 'src/common/utils/google-speech.service';
   cors: {
     origin: '*',
   },
-  namespace: 'speech-to-text',
 })
-@Injectable()
+// @Injectable()
 export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
@@ -32,9 +32,10 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('Client disconnected', client);
   }
 
-  async handleMessage(client: Socket, message: any) {
-    if (message instanceof ArrayBuffer) {
-      const audioData = new Uint8Array(message);
+  @SubscribeMessage('speech-to-text')
+  async handleMessage(client: Socket, data: any) {
+    if (data instanceof ArrayBuffer) {
+      const audioData = new Uint8Array(data);
       try {
         const text = await this.googleSpeechService.transcribeAudio(audioData);
         client.send(text);
