@@ -5,9 +5,15 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ENVIRONMENT } from './common/configs/environment';
+import { EventModule } from './modules/event/event.module';
 
 @Module({
-  imports: [MongooseModule.forRoot(ENVIRONMENT.DB.URL), AuthModule, UserModule],
+  imports: [
+    MongooseModule.forRoot(ENVIRONMENT.DB.URL),
+    AuthModule,
+    UserModule,
+    EventModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

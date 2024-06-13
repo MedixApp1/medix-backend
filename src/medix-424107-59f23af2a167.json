@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "medix-424107",
+  "private_key_id": "59f23af2a167e3516ab80f1d319a49f44000fd36",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCvG+JToJjaLXE8\ns+Ha6tW5tSqvQqu51Ejf3g17XHWaAxJvUlA2qaIyCPbAlb62xvfhv6i6o1viSnjD\nptAwMFYmVWlC3+6tuI301Ut+oAnLkCzweT4hg0UXJ7Ph3tSc13b7Wzua9QKdLWA7\ndnjqrBvyoSQB1Pf6gCsmZ9sP1VAaeOCmr9AIuebjEB85o2UwGonqksGxMXATY0g2\nFQ2Y2lX7wqgeCogWt+ZhUWo2WJhlZvVQbvM38otBs9Ds9oo/uaEm3jPLlWS1DU9G\nOtZ/O095zLJB0TDm/I6o2IO8iom+CJBgytj4tJwZH21GOllPznBcAgnKvD+Wwi2N\nzp4yntDJAgMBAAECggEAC9WlW/QKaJJyKQFaRhahd7HaDurBWueRPkoOXLRAwXYs\nMIheYfdgfiOzc4wbTdSQK7ptj6GbQ+W3GDgFsYAOznvux4WFZsnGlFG3DrmHt/GI\nS/9Rtuedi4VUJ7OM6IW6ZZ4CnwQol1FaA+LLpMaZg/ImkhYf5Vb0s52IxV7sEUHW\nArJPkHxLQGxA5qtJattjWKfn4nKIkQQmBUqKvtbEphjEORU+dbViZlE9Q5WwR7GE\nQ8TNIBl97In+fASq9eKIJ5gCuWZGY9aoJRSf6IbHcD1C7lb8LlmceBkuJ7WMdrjp\n9kzZXEUu/XzT4KFMgiM/YX/RYOgAOVTDa/QIBg2w1QKBgQDYjmMecVYW+VcNiYlE\nmJdIePaPCXS6iA4zbEwGW+qkqY/z7GLPddNiC2GJgWYwn1D1izYgex2g1MMOXoRv\nXteKytSnGG3lrLw6OK0E6ij+cm6DGX/RQhxTMNFMt62vai1rhu+yDJBPe4CydbSS\njlrbvyMAzqvyq4+o1VJoQCYl7QKBgQDPAOMu/rnJbVeahza/H1HE5uGf+TFx7sK8\nTbgXae5SF8i2qLhZmPgL2E5Qd/kh1L/W+kpxcOwXWNEzfgIJZEHtjBJum17g5Eb3\n94+VB9URSpqWWWhGUuM4JdiHWX7ZeU0usXAD0WS2zxOPmU0cv2ntYChm2XMrkJX8\n6aUPfg36zQKBgGhv0tF9qx0NRrRanf6c8GidHZtB3i+PKfoWwltWvMSImcnzOHwA\nwN7JylI8O4I7cxnX91SWy2Ui9qbZYlkrjht7Ui77kxRux5/0cUyrePWtTiqfg4rx\nrSNZqbar5nFwbVMsEjD16irKzvhB18HOMXdEqKbdBQPVRUURC9sHBN7JAoGAdCgU\nU1+ekxfnK5AqOU7yzGGeQ+1KQJtw7MdTwNexYqF0AINmhuhecA8dyuu3gbNnPtPO\nCCAMawFsys8vh2OZ1xldknFe6SVPaX+iM0dk2UIawrlC2QtT80LRYQnoM1Js7AGn\nUI0kTayfVln4umPypb/qi+QDS3PjpjrZY3shjxUCgYEAny8eDPWNo35H38h5gAAP\nuK1VLxZbFHz58hz+YFFkbuwGhZ+T3t1zVqp6GQv5qiISEnHpfwZDl98eF/1YBn7g\nn2gVK6zyg33lAsF6+/KppCL35j8kSp+ZQXD0/KfOiVGKERpcgb8wtGVYIc1SvAYr\nbBeU+l/6z9Kkpe7/4B5JnKU=\n-----END PRIVATE KEY-----\n",
+  "client_email": "celestine@medix-424107.iam.gserviceaccount.com",
+  "client_id": "103311116722665771364",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/celestine%40medix-424107.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

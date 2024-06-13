@@ -4,14 +4,19 @@ dotenv.config();
 export interface IEnvironment {
   APP: {
     NAME: string;
-    PORT: number
+    PORT: number;
     ENV: string;
   };
   DB: {
-    URL:string
+    URL: string;
   };
   JWT: {
-    SECRET: string
+    SECRET: string;
+  };
+  GOOGLE: {
+    CLOUD: {
+      API_KEY: string;
+    };
   };
 }
 
@@ -22,9 +27,14 @@ export const ENVIRONMENT: IEnvironment = {
     ENV: process.env.APP_ENV,
   },
   DB: {
-    URL: process.env.DB_URL
+    URL: process.env.DB_URL,
   },
   JWT: {
-    SECRET: process.env.JWT_SECRET
-  }
+    SECRET: process.env.JWT_SECRET,
+  },
+  GOOGLE: {
+    CLOUD: {
+      API_KEY: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    },
+  },
 };
