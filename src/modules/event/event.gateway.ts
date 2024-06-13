@@ -47,4 +47,4 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.warn('Received non-audio data on WebSocket');
     }
   }
-}
+};
