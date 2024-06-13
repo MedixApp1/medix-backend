@@ -23,7 +23,6 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly googleSpeechService: GoogleSpeechService) {
     this.server = new Server({ noServer: true });
   }
-
   handleConnection(client: Socket) {
     console.log('Client connected', client);
   }
