@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // ws.gateway.ts
 // import { Injectable } from '@nestjs/common';
 import { Server } from 'ws';
@@ -24,11 +25,11 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server = new Server({ noServer: true });
   }
   handleConnection(client: Socket) {
-    console.log('Client connected', client);
+    console.log('Client connected');
   }
 
   async handleDisconnect(client: Socket) {
-    console.log('Client disconnected', client);
+    console.log('Client disconnected');
   }
 
   @SubscribeMessage('speech-to-text')
