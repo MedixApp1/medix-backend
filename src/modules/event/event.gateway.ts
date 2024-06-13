@@ -35,7 +35,7 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('speech-to-text')
   async handleMessage(client: Socket, data: any) {
     if (data instanceof ArrayBuffer) {
-      const audioData = new Uint8Array(data);
+      const audioData = new Uint8Array(data)
       try {
         const text = await this.googleSpeechService.transcribeAudio(audioData);
         client.send(text);
