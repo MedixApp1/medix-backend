@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // ws.gateway.ts
 // import { Injectable } from '@nestjs/common';
-import { Server } from 'ws';
-import Socket = require('ws');
+import { Server, Socket } from 'socket.io';
 
 import {
   WebSocketGateway,
@@ -11,7 +10,7 @@ import {
   SubscribeMessage,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { GoogleSpeechService } from 'src/common/utils/google-speech.service';
+import { SpeechService } from 'src/common/utils/google-speech.service';
 import { OnModuleInit } from '@nestjs/common';
 import { IsBase64, isBase64 } from 'class-validator';
 
@@ -21,44 +20,41 @@ import { IsBase64, isBase64 } from 'class-validator';
   },
 })
 // @Injectable()
-export class EventGateway implements OnModuleInit {
-  @WebSocketServer()
-  server: Server;
+export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer() server: Server;
 
-  constructor(private readonly googleSpeechService: GoogleSpeechService) {
-    this.server = new Server({ noServer: true });
+  constructor(private speechService: SpeechService) {}
+
+  handleConnection(client: Socket) {
+    console.log(`** a user connected - ${client.id} **\n`);
   }
-  onModuleInit() {
-    this.server.on('connection', (socket) => {
-      console.log(`Connected with socket id: ${socket.url}`);
-    });
+
+  handleDisconnect(client: Socket) {
+    console.log('** user disconnected **\n');
+  }
+
+  @SubscribeMessage('test')
+  handleMessage(client: Socket, message: string) {
+    console.log('message: ' + message);
+    setTimeout(() => {
+      this.server.emit('receive_message', 'got this message' + message);
+    }, 1000);
   }
 
   @SubscribeMessage('speech-to-text')
-  async handleMessage(client: Socket, data: string) {
-    const stuff = JSON.parse(data);
-    const audio = stuff.payload;
-    if (audio) {
-      const audioData = Uint8Array.from(Buffer.from(audio, 'base64'));
-      // const audioData = new Uint8Array(audio);
-      const audioStream = this.createAsyncIterable(audioData);
-      try {
-        const text =
-          await this.googleSpeechService.convertSpeechToTextStream(audioStream);
-        console.log(text);
-        client.send(text);
-      } catch (error) {
-        console.error('Error during speech recognition:', error);
-        client.send('Error processing audio');
-      }
-    } else {
-      console.warn('Received non-audio data on WebSocket');
-    }
+  handleStartStream(client: Socket, data: any) {
+    this.speechService.startRecognitionStream(client, data);
   }
 
-  private async *createAsyncIterable(
-    data: Uint8Array,
-  ): AsyncIterableIterator<Uint8Array> {
-    yield data;
+  @SubscribeMessage('endGoogleCloudStream')
+  handleEndStream() {
+    console.log('** ending google cloud stream **\n');
+    this.speechService.stopRecognitionStream();
+  }
+
+  @SubscribeMessage('stuff')
+  handleAudioData(client: Socket, audioData: { audio: Buffer }) {
+    this.server.emit('receive_message', 'Got audio data');
+    this.speechService.handleAudioData(audioData);
   }
 }
