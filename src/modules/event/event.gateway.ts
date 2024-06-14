@@ -15,7 +15,7 @@ import { GoogleSpeechService } from 'src/common/utils/google-speech.service';
 @WebSocketGateway({
   cors: {
     origin: '*',
-  },
+  }
 })
 // @Injectable()
 export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -34,11 +34,13 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('speech-to-text')
   async handleMessage(client: Socket, data: any) {
+    console.log(data)
     if (data instanceof ArrayBuffer) {
       const audioData = new Uint8Array(data);
       const audioStream = this.createAsyncIterable(audioData);
       try {
-        const text = await this.googleSpeechService.convertSpeechToTextStream(audioStream);
+        const text =
+          await this.googleSpeechService.convertSpeechToTextStream(audioStream);
         client.send(text);
       } catch (error) {
         console.error('Error during speech recognition:', error);
@@ -49,7 +51,9 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  private async *createAsyncIterable(data: Uint8Array): AsyncIterableIterator<Uint8Array> {
+  private async *createAsyncIterable(
+    data: Uint8Array,
+  ): AsyncIterableIterator<Uint8Array> {
     yield data;
   }
-};
+}
