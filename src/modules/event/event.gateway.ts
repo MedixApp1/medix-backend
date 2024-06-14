@@ -35,9 +35,10 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('speech-to-text')
   async handleMessage(client: Socket, data: any) {
     if (data instanceof ArrayBuffer) {
-      const audioData = new Uint8Array(data)
+      const audioData = new Uint8Array(data);
+      const audioStream = this.createAsyncIterable(audioData);
       try {
-        const text = await this.googleSpeechService.transcribeAudio(audioData);
+        const text = await this.googleSpeechService.convertSpeechToTextStream(audioStream);
         client.send(text);
       } catch (error) {
         console.error('Error during speech recognition:', error);
@@ -46,5 +47,9 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } else {
       console.warn('Received non-audio data on WebSocket');
     }
+  }
+
+  private async *createAsyncIterable(data: Uint8Array): AsyncIterableIterator<Uint8Array> {
+    yield data;
   }
 };
