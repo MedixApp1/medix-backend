@@ -45,8 +45,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  const inputFile = new Blob([readFileSync('../medix-backend/src/common/utils/example.wav')]);
-  console.log(await audioToText(inputFile));
+  // const inputFile = new Blob([readFileSync('../medix-backend/src/common/utils/example.wav')]);
+  // console.log(await audioToText(inputFile));
   await app.listen(ENVIRONMENT.APP.PORT || 3000);
 }
 bootstrap();
