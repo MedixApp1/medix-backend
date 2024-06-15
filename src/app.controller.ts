@@ -1,5 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
+import { audioToText } from './common/utils/speechmatics';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller()
 export class AppController {
@@ -11,4 +13,8 @@ export class AppController {
   }
 
   @Post('/speech-to-text')
+  @UseInterceptors(FileInterceptor('file'))
+  async speechToText(@UploadedFile() file) {
+    return await audioToText(file.buffer);
+  }
 }
