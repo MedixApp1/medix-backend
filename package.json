@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@deepgram/sdk": "^3.3.4",
     "@google-cloud/speech": "^6.6.0",
     "@google-cloud/text-to-speech": "^5.3.0",
     "@nestjs/common": "^10.0.0",
@@ -34,6 +35,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
+    "flutter": "^0.0.5",
     "helmet": "^7.1.0",
     "mongoose": "^8.4.1",
     "node-record-lpcm16": "^1.0.1",
@@ -41,7 +43,10 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "speechmatics": "^3.1.7",
+    "streamifier": "^0.1.1",
+    "ws": "^8.17.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -50,9 +55,11 @@
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
+    "@types/multer": "^1.4.11",
     "@types/node": "^20.3.1",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
+    "@types/streamifier": "^0.1.2",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
