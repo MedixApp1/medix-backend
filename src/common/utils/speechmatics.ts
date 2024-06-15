@@ -17,4 +17,4 @@ export const audioToText = async (file: Blob) => {
     format: 'text',
   });
   return transcript;
-};
+}
