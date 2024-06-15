@@ -18,6 +18,9 @@ export interface IEnvironment {
       API_KEY: string;
     };
   };
+  DEEPGRAM: {
+    API_KEY: string;
+  };
 }
 
 export const ENVIRONMENT: IEnvironment = {
@@ -36,5 +39,8 @@ export const ENVIRONMENT: IEnvironment = {
     CLOUD: {
       API_KEY: process.env.GOOGLE_APPLICATION_CREDENTIALS,
     },
+  },
+  DEEPGRAM: {
+    API_KEY: process.env.DEEPGRAM_API_KEY,
   },
 };
