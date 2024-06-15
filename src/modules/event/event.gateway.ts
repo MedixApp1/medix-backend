@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // ws.gateway.ts
 // import { Injectable } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
+import WebSocket, { Server } from 'ws';
+import { Socket } from 'socket.io';
 
 import {
   WebSocketGateway,
@@ -13,13 +14,17 @@ import {
 import { SpeechService } from 'src/common/utils/google-speech.service';
 import { OnModuleInit } from '@nestjs/common';
 import { IsBase64, isBase64 } from 'class-validator';
+import { createWriteStream } from 'fs';
+import { createClient } from '@deepgram/sdk';
+import { ENVIRONMENT } from 'src/common/configs/environment';
+import { setupDeepgram } from 'src/common/utils/helper';
+import { Readable } from 'stream';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
-// @Injectable()
 export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
@@ -34,25 +39,27 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('test')
-  handleMessage(client: Socket, message: string) {
-    console.log('message: ' + message);
-    setTimeout(() => {
-      this.server.emit('receive_message', 'got this message' + message);
-    }, 1000);
+  handleMessage(client: WebSocket, message: string) {
+    const deepgram = setupDeepgram(client);
+    console.log(deepgram);
+    deepgram.send(message);
   }
 
   @SubscribeMessage('speech-to-text')
   handleStartStream(client: Socket, data: any) {
-    this.speechService.startRecognitionStream(client, data);
+    const audio = JSON.parse(data);
+    const audioBuffer = Buffer.from(audio.payload, 'base64');
+    console.log('** starting google cloud stream **\n');
+    this.speechService.startRecognitionStream(client, audioBuffer);
   }
 
-  @SubscribeMessage('endGoogleCloudStream')
+  @SubscribeMessage('end-speech-to-text')
   handleEndStream() {
     console.log('** ending google cloud stream **\n');
     this.speechService.stopRecognitionStream();
   }
 
-  @SubscribeMessage('stuff')
+  @SubscribeMessage('send-audio-data')
   handleAudioData(client: Socket, audioData: { audio: Buffer }) {
     this.server.emit('receive_message', 'Got audio data');
     this.speechService.handleAudioData(audioData);
