@@ -8,8 +8,6 @@ const session = new Speechmatics({ apiKey: API_KEY });
 
 const inputFile = new Blob([readFileSync(PATH_TO_FILE)]);
 
-
-
 export const audioToText = async (file: Blob) => {
   const transcript = await session.batch.transcribe({
     input: file,
@@ -17,4 +15,4 @@ export const audioToText = async (file: Blob) => {
     format: 'text',
   });
   return transcript;
-}
+};
