@@ -13,6 +13,7 @@ import { ResponseTransformerInterceptor } from './common/interceptors/response.i
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: true,
+    
   });
 
   app.use(helmet());
