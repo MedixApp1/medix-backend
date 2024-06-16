@@ -6,8 +6,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filter/filter';
 import { ENVIRONMENT } from './common/configs/environment';
 import { ResponseTransformerInterceptor } from './common/interceptors/response.interceptor';
-import { audioToText } from './common/utils/speechmatics';
-import { readFileSync } from 'fs';
+// import { audioToText } from './common/utils/speechmatics';
+// import { readFileSync } from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
