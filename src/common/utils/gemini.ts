@@ -3,13 +3,13 @@ import { ENVIRONMENT } from '../configs/environment';
 import * as apiKey from '../../medix-424107-59f23af2a167.json';
 import { Storage } from '@google-cloud/storage';
 import {
-  // FunctionDeclarationSchemaType,
-  // GenerateContentRequest,
-  // GenerateContentResult,
+  FunctionDeclarationSchemaType,
+  GenerateContentRequest,
+  GenerateContentResult,
   GenerativeModel,
   HarmBlockThreshold,
   HarmCategory,
-  // Tool,
+  Tool,
   VertexAI,
 } from '@google-cloud/vertexai';
 import { Injectable } from '@nestjs/common';
@@ -98,7 +98,7 @@ export class Gemini {
       },
     };
     const textPart = {
-      text: `Generate transcription with timestamps from the audio, only extract speech and ignore background audio.`,
+      text: `audio`,
     };
 
     const request = {
@@ -107,24 +107,23 @@ export class Gemini {
     const generativeModel = this.vertexAI.getGenerativeModel({
       model: 'gemini-1.5-flash-001',
       systemInstruction: {
-        role: 'Transcriber',
+        role: 'Medical Transcription AI',
         parts: [
           {
-            text: `You are an assistant for doctors. You receive an audio recording of conversation between patient and doctors and generate an array of JSON object in this schema:
-            {
-              "text": text of the speech,
-              "speaker": "Patient" or "Doctor",
-              "start_offset_ms": start offset of the speech in milliseconds,
-              "end_offset_ms": end offset of the speech in milliseconds
-            }`,
+            text: `You are an assistant for doctors. You receive an audio recording of conversation between patient and doctor and generate an array of text seperated by commas, based on this schema:
+            ["Hi doctor", I am feeling unwell", "When did it start?"]
+            `,
           },
+          // { text: `["Hi doctor", I am feeling unwell", "When did it start?"]` }, 
         ],
       },
     });
     const resp = await generativeModel.generateContent(request);
     const contentResponse = resp.response.candidates[0].content.parts[0].text;
-    const stringe = this.extractJson(contentResponse);
-    return stringe;
+    console.log(contentResponse, 'contentResponse');
+    const stringe = JSON.parse(contentResponse);
+    console.log(stringe, 'stringe');
+    return stringe || contentResponse;
   }
   extractJson(textResponse) {
     // This pattern matches a string that starts with '{' and ends with '}'
@@ -178,65 +177,78 @@ export class Gemini {
     }
     return text.slice(start, end);
   }
+  async generateNotesFromTranscript(url: string, mimeType: string) {
+    const functionDeclarations: Tool[] = [
+      {
+        functionDeclarations: [
+          {
+            name: 'generate_medical_notes',
+            description: 'generate medical notes from audio',
+            parameters: {
+              type: FunctionDeclarationSchemaType.OBJECT,
+              properties: {
+                text: { type: FunctionDeclarationSchemaType.STRING },
+                speaker: { type: FunctionDeclarationSchemaType.STRING },
+                start_offset_ms: { type: FunctionDeclarationSchemaType.NUMBER },
+                end_offset_ms: { type: FunctionDeclarationSchemaType.NUMBER },
+              },
+              required: ['text', 'speaker', 'start_offset_ms', 'end_offset_ms'],
+            },
+          },
+        ],
+      },
+    ];
+    const toolConfig = {
+      function_calling_config: {
+        mode: 'ANY',
+        allowed_function_names: ['generate_transcript'],
+      },
+    };
+    const generationConfig = {
+      temperature: 0.95,
+      topP: 1.0,
+      maxOutputTokens: 8192,
+    };
+
+    const filePart = {
+      fileData: {
+        fileUri: url,
+        mimeType: mimeType,
+      },
+    };
+    const textPart = {
+      text: `Generate transcription with timestamps from the audio, only extract speech and ignore background audio.`,
+    };
+
+    const request = {
+      contents: [{ role: 'user', parts: [filePart, textPart] }],
+      tools: functionDeclarations,
+      toolConfig: toolConfig,
+      generationConfig: generationConfig,
+    };
+
+    const model = this.vertexAI.preview.getGenerativeModel({
+      model: 'gemini-1.5-flash-001',
+      systemInstruction: {
+        role: 'Medical Transcription AI',
+        parts: [
+          {
+            text: `You are a medical AI that converts doctor-patient conversations into structured clinical notes.`,
+          },
+          {
+            text: `Extract relevant medical information, use appropriate terminology, and organize into the specified JSON format.`,
+          },
+          {
+            text: `Maintain confidentiality, focus on medical details, and leave sections empty if no relevant information is available.`,
+          },
+          {
+            text: `Aim for clear, concise notes useful for healthcare providers.`,
+          },
+        ],
+      },
+    });
+    const resp = await model.generateContent(request);
+    const contentResponse = resp.response.candidates[0].content;
+    return contentResponse;
+  }
 }
-
-// ```
-// async generateTranscriptFromAudio(url: string, mimeType: string) {
-//     const functionDeclarations: Tool[] = [
-//       {
-//         functionDeclarations: [
-//           {
-//             name: 'generate_transcript',
-//             description: 'generate transcript from audio',
-//             parameters: {
-//               type: FunctionDeclarationSchemaType.OBJECT,
-//               properties: {
-//                 text: { type: FunctionDeclarationSchemaType.STRING },
-//                 speaker: { type: FunctionDeclarationSchemaType.STRING },
-//                 start_offset_ms: { type: FunctionDeclarationSchemaType.NUMBER },
-//                 end_offset_ms: { type: FunctionDeclarationSchemaType.NUMBER },
-//               },
-//               required: ['text', 'speaker', 'start_offset_ms', 'end_offset_ms'],
-//             },
-//           },
-//         ],
-//       },
-//     ];
-//     const toolConfig = {
-//       function_calling_config: {
-//         mode: 'ANY',
-//         allowed_function_names: ['generate_transcript'],
-//       },
-//     };
-//     const generationConfig = {
-//       temperature: 0.95,
-//       topP: 1.0,
-//       maxOutputTokens: 8192,
-//     };
-
-//     const filePart = {
-//       fileData: {
-//         fileUri: url,
-//         mimeType: mimeType,
-//       },
-//     };
-//     const textPart = {
-//       text: `Generate transcription with timestamps from the audio, only extract speech and ignore background audio.`,
-//     };
-
-//     const request = {
-//       contents: [{ role: 'user', parts: [filePart, textPart] }],
-//       tools: functionDeclarations,
-//       toolConfig: toolConfig,
-//       generationConfig: generationConfig,
-//     };
-
-//     const model = this.vertexAI.preview.getGenerativeModel({
-//       model: 'gemini-1.5-flash-001',
-//     });
-//     const resp = await model.generateContent(request);
-//     const contentResponse = resp.response.candidates[0].content;
-//     return contentResponse;
-//   }
-// }
-// ```

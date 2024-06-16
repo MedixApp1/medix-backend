@@ -23,7 +23,7 @@ export class AppointmentService {
       payload.mimeType,
     );
     const newAppointment = await this.appointmentModel.create({
-      transcript,
+      transcript: transcript,
     });
     await this.userService.addAppointmentToUser(userId, newAppointment.id);
     return newAppointment;

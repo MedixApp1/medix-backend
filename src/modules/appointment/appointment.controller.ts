@@ -27,6 +27,7 @@ export class AppointmentController {
   @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.UPLOAD_AUDIO_SUCCESS)
   @UseInterceptors(FileInterceptor('file'))
   async uploadAudio(@UploadedFile() file: Express.Multer.File) {
+    console.log(file)
     const uploadResult = await this.geminiService.uploadFile(
       file,
       file.mimetype,
@@ -36,7 +37,7 @@ export class AppointmentController {
     }
     return uploadResult;
   }
-
+ 
   @Post('/')
   @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.CREATE_APPOINTMENT_SUCCESS)
   async createAppointment(

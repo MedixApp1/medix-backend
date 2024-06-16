@@ -9,17 +9,8 @@ export class Appointment {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user: User;
 
-  @Prop({ required: true, unique: true })
-  transcript: [
-    {
-      text: string;
-      speaker: string;
-      start_offset_ms: number;
-      end_offset_ms: number;
-    },
-  ];
-
-  
+  @Prop({ required: true })
+  transcript: [string];
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);
