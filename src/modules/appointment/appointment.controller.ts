@@ -31,6 +31,9 @@ export class AppointmentController {
       file,
       file.mimetype,
     );
+    if (!uploadResult) {
+      throw new BadRequestException('Error in uploading audio to cloud storage')
+    }
     return uploadResult;
   }
 
