@@ -2,7 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
-import { Request } from 'express';
+import  { Request } from 'express';
 import { ENVIRONMENT } from 'src/common/configs/environment';
 import { UserService } from '../../user/user.service';
 
@@ -13,6 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       passReqToCallback: true,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
+      expiresIn: '1d',
       secretOrKey: ENVIRONMENT.JWT.SECRET,
     });
   }

@@ -35,7 +35,7 @@ export class AuthService {
       throw new BadRequestException('Incorrect Password');
     }
 
-    const token = this.jwtService.sign({ id: user._id });
+    const token = this.jwtService.sign({ id: user._id }, { expiresIn: '1d' });
 
     return {
       ...user.toJSON(),

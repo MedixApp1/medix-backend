@@ -13,5 +13,12 @@ export const RESPONSE_CONSTANT = {
     GET_CURRENT_USER_SUCCESS: 'Current User Retrieved Successfully',
     UPDATE_USER_SUCCESS: 'User Updated Successfully',
     DELETE_USER_SUCCESS: 'User Deleted Successfully'
-  }
+  },
+  APPOINTMENT: {
+    UPLOAD_AUDIO_SUCCESS: 'Audio Uploaded Successfully',
+    CREATE_APPOINTMENT_SUCCESS: 'Appointment Created Successfully',
+    GET_APPOINTMENT_SUCCESS: 'Appointment Retrieved Successfully',
+    UPDATE_APPOINTMENT_SUCCESS: 'Appointment Updated Successfully',
+    DELETE_APPOINTMENT_SUCCESS: 'Appointment Deleted Successfully'
+  },
 };
