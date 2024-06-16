@@ -20,7 +20,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@deepgram/sdk": "^3.3.4",
     "@google-cloud/speech": "^6.6.0",
     "@google-cloud/storage": "^7.11.2",
     "@google-cloud/text-to-speech": "^5.3.0",
@@ -40,7 +39,6 @@
     "dotenv": "^16.4.5",
     "flutter": "^0.0.5",
     "generative-ai": "^0.1.4",
-    "googleapis": "^140.0.0",
     "helmet": "^7.1.0",
     "mongoose": "^8.4.1",
     "node-record-lpcm16": "^1.0.1",
@@ -49,8 +47,6 @@
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
-    "speechmatics": "^3.1.7",
-    "streamifier": "^0.1.1",
     "ws": "^8.17.0"
   },
   "devDependencies": {

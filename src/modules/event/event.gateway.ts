@@ -15,9 +15,7 @@ import { SpeechService } from 'src/common/utils/google-speech.service';
 import { OnModuleInit } from '@nestjs/common';
 import { IsBase64, isBase64 } from 'class-validator';
 import { createWriteStream } from 'fs';
-import { createClient } from '@deepgram/sdk';
 import { ENVIRONMENT } from 'src/common/configs/environment';
-import { setupDeepgram } from 'src/common/utils/helper';
 import { Readable } from 'stream';
 
 @WebSocketGateway({
@@ -39,11 +37,6 @@ export class EventGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('test')
-  handleMessage(client: WebSocket, message: string) {
-    const deepgram = setupDeepgram(client);
-    console.log(deepgram);
-    deepgram.send(message);
-  }
 
   @SubscribeMessage('speech-to-text')
   handleStartStream(client: Socket, data: any) {

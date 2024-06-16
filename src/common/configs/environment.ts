@@ -21,9 +21,6 @@ export interface IEnvironment {
       API_KEY: string;
     };
   };
-  DEEPGRAM: {
-    API_KEY: string;
-  };
 }
 
 export const ENVIRONMENT: IEnvironment = {
@@ -45,8 +42,5 @@ export const ENVIRONMENT: IEnvironment = {
     GEMINI: {
       API_KEY: process.env.GEMINI_API_KEY,
     },
-  },
-  DEEPGRAM: {
-    API_KEY: process.env.DEEPGRAM_API_KEY,
   },
 };
