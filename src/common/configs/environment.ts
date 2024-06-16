@@ -17,6 +17,9 @@ export interface IEnvironment {
     CLOUD: {
       API_KEY: string;
     };
+    GEMINI: {
+      API_KEY: string;
+    };
   };
   DEEPGRAM: {
     API_KEY: string;
@@ -38,6 +41,9 @@ export const ENVIRONMENT: IEnvironment = {
   GOOGLE: {
     CLOUD: {
       API_KEY: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    },
+    GEMINI: {
+      API_KEY: process.env.GEMINI_API_KEY,
     },
   },
   DEEPGRAM: {
