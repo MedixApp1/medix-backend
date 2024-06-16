@@ -4,6 +4,7 @@ import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
 import { BaseHelper } from 'src/common/utils/helper';
+import { Gemini } from 'src/common/utils/gemini';
 
 @Module({
   imports: [
@@ -47,7 +48,7 @@ import { BaseHelper } from 'src/common/utils/helper';
       },
     ]),
   ],
-  providers: [UserService],
+  providers: [UserService, Gemini],
   controllers: [UserController],
   exports: [UserService],
 })
