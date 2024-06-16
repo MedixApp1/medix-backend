@@ -47,6 +47,7 @@
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
+    "speechmatics": "^3.1.7",
     "ws": "^8.17.0"
   },
   "devDependencies": {

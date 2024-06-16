@@ -18,7 +18,6 @@ export class Gemini {
   vertexAI: VertexAI;
   fileManager: GoogleAIFileManager;
   constructor() {
-    this.apiKey = ENVIRONMENT.GOOGLE.GEMINI.API_KEY;
     this.vertexAI = new VertexAI({
       project: apiKey.project_id,
       location: 'us-central1',
