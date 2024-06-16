@@ -19,11 +19,7 @@ export class Appointment {
     },
   ];
 
-  @Prop({ required: true, enum: ['local', 'google'], default: 'local' })
-  type: string;
-
-  @Prop({ select: false })
-  password: string;
+  
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);

@@ -32,6 +32,17 @@ export class UserService {
       .select('-password');
   }
 
+  async addAppointmentToUser(
+    userId: string,
+    appointmentId: string,
+  ): Promise<User> {
+    return await this.userModel.findByIdAndUpdate(
+      userId,
+      { $push: { appointments: appointmentId } },
+      { new: true },
+    );
+  }
+
   async deleteUser(userId: string): Promise<User> {
     return await this.userModel.findByIdAndDelete(userId);
   }

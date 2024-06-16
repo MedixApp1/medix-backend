@@ -4,6 +4,7 @@ import {
   Controller,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
@@ -12,8 +13,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Gemini } from 'src/common/utils/gemini';
 import { ResponseMessage } from 'src/common/decorators/response.decorator';
 import { RESPONSE_CONSTANT } from 'src/common/constants/response.constant';
+import { LoggedInUserDecorator } from 'src/common/decorators/logged_in_user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 
 @Controller('appointment')
+@UseGuards(JwtAuthGuard)
 export class AppointmentController {
   constructor(
     private readonly appointmentService: AppointmentService,
@@ -32,19 +36,18 @@ export class AppointmentController {
 
   @Post('/')
   @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.CREATE_APPOINTMENT_SUCCESS)
-  async generateTranscript(@Body() body: CreateAppointmentDto) {
-    const transcript = await this.geminiService.generateTranscriptFromAudio(
-      body.url,
-      body.mimeType,
+  async createAppointment(
+    @Body() body: CreateAppointmentDto,
+    @LoggedInUserDecorator() user: { id: string },
+  ) {
+    const newAppointment = await this.appointmentService.createAppointment(
+      user.id,
+      body,
     );
 
-    const newTranscript = await this.appointmentService.createAppointment({
-      transcript,
-    });
-
-    if (!newTranscript) {
+    if (!newAppointment) {
       throw new BadRequestException('Failed to create appointment');
     }
-    return newTranscript;
+    return newAppointment;
   }
 }
