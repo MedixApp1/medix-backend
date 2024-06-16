@@ -78,11 +78,13 @@ export class Gemini {
         `${file.originalname} uploaded to ${'medix-conversation-audio'}.`,
       );
       const [metadata] = await newFile.getMetadata();
+      console.log(metadata);
 
       return {
         name: metadata.name,
         size: metadata.size,
         mimeType: metadata.contentType,
+        publicUrl: `https://storage.cloud.google.com/medix-conversation-audio/${metadata.name}`,
         url: `gs://${metadata.bucket}/${metadata.name}`,
       };
     } catch (error) {
@@ -114,16 +116,13 @@ export class Gemini {
             ["Hi doctor", I am feeling unwell", "When did it start?"]
             `,
           },
-          // { text: `["Hi doctor", I am feeling unwell", "When did it start?"]` }, 
         ],
       },
     });
     const resp = await generativeModel.generateContent(request);
     const contentResponse = resp.response.candidates[0].content.parts[0].text;
-    console.log(contentResponse, 'contentResponse');
     const stringe = JSON.parse(contentResponse);
-    console.log(stringe, 'stringe');
-    return stringe || contentResponse;
+    return stringe;
   }
   extractJson(textResponse) {
     // This pattern matches a string that starts with '{' and ends with '}'
