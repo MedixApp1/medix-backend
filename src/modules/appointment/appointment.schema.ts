@@ -16,7 +16,7 @@ export class Appointment {
     raw({
       title: String,
       sections: [
-        raw({ key: String, title: String, text: String, content: String }),
+        raw({ key: String, title: String, text: String, content: Array }),
       ],
     }),
   )

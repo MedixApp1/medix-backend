@@ -3,16 +3,15 @@ import { ENVIRONMENT } from '../configs/environment';
 import * as apiKey from '../../medix-424107-59f23af2a167.json';
 import { Storage } from '@google-cloud/storage';
 import {
-  FunctionDeclarationSchemaType,
-  GenerateContentRequest,
-  GenerateContentResult,
   GenerativeModel,
   HarmBlockThreshold,
   HarmCategory,
-  Tool,
   VertexAI,
 } from '@google-cloud/vertexai';
 import { Injectable } from '@nestjs/common';
+import {
+  Appointment,
+} from 'src/modules/appointment/appointment.schema';
 
 @Injectable()
 export class Gemini {
@@ -181,6 +180,7 @@ export class Gemini {
       temperature: 0.95,
       topP: 1.0,
       maxOutputTokens: 8192,
+      response_mime_type: 'application/json',
     };
 
     const request = {
@@ -318,11 +318,16 @@ export class Gemini {
       },
     });
     const resp = await model.generateContent(request);
-    const contentResponse = resp.response.candidates[0].content.parts[0].text;
+    const contentResponse = JSON.parse(
+      resp.response.candidates[0].content.parts[0].text,
+    );
     console.log(contentResponse);
-    const jsonContent = this.extractJson(contentResponse);
-    console.log(jsonContent);
-    return jsonContent;
+    // let jsonContent = contentResponse
+    //   .replace(/```json\n/, '')
+    //   .replace(/\n```$/, '');
+    // jsonContent = JSON.parse(jsonContent);
+    // console.log(jsonContent, 'stuff');
+    return contentResponse as unknown as Appointment['note'];
   }
 
   async generatePatientInstructionsfFromTranscript(transcript: string) {
@@ -330,73 +335,63 @@ export class Gemini {
       temperature: 0.95,
       topP: 1.0,
       maxOutputTokens: 8192,
+      response_mime_type: 'application/json',
     };
 
-    const functionDeclarations: Tool[] = [
-      {
-        functionDeclarations: [
-          {
-            name: 'get_patient_medication',
-            description: 'get the patient medication from transcript',
-            parameters: {
-              type: FunctionDeclarationSchemaType.OBJECT,
-              properties: {
-                action: { type: FunctionDeclarationSchemaType.STRING },
-                details: { type: FunctionDeclarationSchemaType.STRING },
-              },
-              required: ['action', 'details'],
-            },
-          },
-          {
-            name: 'get_patient_lifestyle_changes',
-            description: 'get the patient lifestyle changes from transcript',
-            parameters: {
-              type: FunctionDeclarationSchemaType.OBJECT,
-              properties: {
-                action: { type: FunctionDeclarationSchemaType.STRING },
-                details: { type: FunctionDeclarationSchemaType.STRING },
-              },
-              required: ['action', 'details'],
-            },
-          },
-          {
-            name: 'get_patient_follow_up',
-            description: 'get the patient follow up from transcript',
-            parameters: {
-              type: FunctionDeclarationSchemaType.OBJECT,
-              properties: {
-                action: { type: FunctionDeclarationSchemaType.STRING },
-                details: { type: FunctionDeclarationSchemaType.STRING },
-              },
-              required: ['action', 'details'],
-            },
-          },
-          {
-            name: 'get_patient_other_instructions',
-            description: 'get the patient other instructions from transcript',
-            parameters: {
-              type: FunctionDeclarationSchemaType.OBJECT,
-              properties: {
-                action: { type: FunctionDeclarationSchemaType.STRING },
-                details: { type: FunctionDeclarationSchemaType.STRING },
-              },
-              required: ['action', 'details'],
-            },
-          },
-        ],
-      },
-    ];
-    const toolConfig = {
-      function_calling_config: {
-        mode: 'ANY',
-        // allowed_function_names: [
-        //   'get_patient_medication',
-        //   'get_patient_lifestyle_changes',
-        //   'get_patient_follow_up',
-        //   'get_patient_other_instructions',
-        // ],
-      },
-    };
+    // const functionDeclarations: Tool[] = [
+    //   {
+    //     functionDeclarations: [
+    //       {
+    //         name: 'get_patient_medication',
+    //         description: 'get the patient medication from transcript',
+    //         parameters: {
+    //           type: FunctionDeclarationSchemaType.OBJECT,
+    //           properties: {
+    //             action: { type: FunctionDeclarationSchemaType.STRING },
+    //             details: { type: FunctionDeclarationSchemaType.STRING },
+    //           },
+    //           required: ['action', 'details'],
+    //         },
+    //       },
+    //       {
+    //         name: 'get_patient_lifestyle_changes',
+    //         description: 'get the patient lifestyle changes from transcript',
+    //         parameters: {
+    //           type: FunctionDeclarationSchemaType.OBJECT,
+    //           properties: {
+    //             action: { type: FunctionDeclarationSchemaType.STRING },
+    //             details: { type: FunctionDeclarationSchemaType.STRING },
+    //           },
+    //           required: ['action', 'details'],
+    //         },
+    //       },
+    //       {
+    //         name: 'get_patient_follow_up',
+    //         description: 'get the patient follow up from transcript',
+    //         parameters: {
+    //           type: FunctionDeclarationSchemaType.OBJECT,
+    //           properties: {
+    //             action: { type: FunctionDeclarationSchemaType.STRING },
+    //             details: { type: FunctionDeclarationSchemaType.STRING },
+    //           },
+    //           required: ['action', 'details'],
+    //         },
+    //       },
+    //       {
+    //         name: 'get_patient_other_instructions',
+    //         description: 'get the patient other instructions from transcript',
+    //         parameters: {
+    //           type: FunctionDeclarationSchemaType.OBJECT,
+    //           properties: {
+    //             action: { type: FunctionDeclarationSchemaType.STRING },
+    //             details: { type: FunctionDeclarationSchemaType.STRING },
+    //           },
+    //           required: ['action', 'details'],
+    //         },
+    //       },
+    //     ],
+    //   },
+    // ];
     const request = {
       contents: [
         {
@@ -411,8 +406,6 @@ export class Gemini {
           ],
         },
       ],
-      tools: functionDeclarations,
-      toolConfig: toolConfig,
       generationConfig: generationConfig,
     };
 
@@ -422,7 +415,42 @@ export class Gemini {
         role: 'Patient Instructions AI',
         parts: [
           {
-            text: `You are a patient instructions AI that generates instructions and next steps for patients from doctor-patient consultation based on a transcript sent by the user`,
+            text: `
+            Convert the following doctor-patient conversation transcript into structured patient instructions in JSON format. Focus on actionable items, medications, lifestyle changes, and follow-up recommendations. Use this structure:
+
+{
+  "patient_instructions": {
+    "message_from_doctor": "",
+    "medication": [
+      {
+        "action": "",
+        "details": ""
+      }
+    ],
+    "lifestyle_changes": [
+      {
+        "action": "",
+        "details": ""
+      }
+    ],
+    "follow_up": [
+      {
+        "action": "",
+        "details": ""
+      }
+    ],
+    "other_instructions": [
+      {
+        "action": "",
+        "details": ""
+      }
+    ]
+  }
+}
+
+For the "message_from_doctor" field, include a brief, kind message summarizing the visit and offering encouragement to the patient.
+
+Ensure each instruction is clear, concise, and directly related to the patient's care. If a category has no relevant instructions, leave it as an empty array.`,
           },
         ],
       },
@@ -448,7 +476,9 @@ export class Gemini {
     const resp = await model.generateContent(request);
     const contentResponse = resp.response.candidates[0].content.parts[0].text;
     console.log(resp.response.candidates[0].content.parts[0]);
-    const stringe = this.extractJson(contentResponse);
+    const stringe = contentResponse
+      .replace(/```json\n/, '')
+      .replace(/\n```$/, '');
     console.log(stringe);
     return stringe;
   }

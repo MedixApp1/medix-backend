@@ -44,15 +44,14 @@ export class AppointmentService {
     if (!currentAppointment) {
       throw new BadRequestException('Invalid Appointment ID');
     }
-    const newNote = await this.geminiService.generateNotesFromTranscript(
+    const { note } = await this.geminiService.generateNotesFromTranscript(
       currentAppointment.transcript.join('/n'),
       country,
     );
-    console.log(newNote);
     const updatedAppointment = await this.appointmentModel.findByIdAndUpdate(
       appointmentId,
       {
-        note: newNote,
+        note,
       },
       { new: true },
     );
@@ -66,10 +65,17 @@ export class AppointmentService {
     if (!currentAppointment) {
       throw new BadRequestException('Invalid Appointment ID');
     }
-    const newPatientInstructions = await this.geminiService.generatePatientInstructionsfFromTranscript(currentAppointment.transcript.join('/n'));
-  const updatedAppointment=await this.appointmentModel.findByIdAndUpdate(appointmentId, {
-    patientInstructions: newPatientInstructions,
-  }, { new: true });
-  return updatedAppointment
+    const newPatientInstructions =
+      await this.geminiService.generatePatientInstructionsfFromTranscript(
+        currentAppointment.transcript.join('/n'),
+      );
+    const updatedAppointment = await this.appointmentModel.findByIdAndUpdate(
+      appointmentId,
+      {
+        patientInstructions: newPatientInstructions,
+      },
+      { new: true },
+    );
+    return updatedAppointment;
   }
 }
