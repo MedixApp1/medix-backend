@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { User } from '../user/user.schema';
 
@@ -11,6 +11,23 @@ export class Appointment {
 
   @Prop({ required: true })
   transcript: [string];
+
+  @Prop(
+    raw({
+      title: String,
+      sections: [
+        raw({ key: String, title: String, text: String, content: String }),
+      ],
+    }),
+  )
+  note: Record<string, any>;
+  @Prop(
+    raw({
+      action: String,
+      details: String,
+    }),
+  )
+  patientInstructions: Record<string, any>;
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);

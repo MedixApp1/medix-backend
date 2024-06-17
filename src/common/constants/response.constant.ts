@@ -17,6 +17,8 @@ export const RESPONSE_CONSTANT = {
   APPOINTMENT: {
     UPLOAD_AUDIO_SUCCESS: 'Audio Uploaded Successfully',
     CREATE_APPOINTMENT_SUCCESS: 'Appointment Created Successfully',
+    CREATE_APPOINTMENT_NOTE_SUCCESS: 'Appointment Note Created Successfully',
+    CREATE_APPOINTMENT_PATIENT_INSTRUCTIONS_SUCCESS: 'Patient Instructions Created Successfully',
     GET_APPOINTMENT_SUCCESS: 'Appointment Retrieved Successfully',
     UPDATE_APPOINTMENT_SUCCESS: 'Appointment Updated Successfully',
     DELETE_APPOINTMENT_SUCCESS: 'Appointment Deleted Successfully'

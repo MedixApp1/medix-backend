@@ -1,5 +1,7 @@
 import {
   IsMimeType,
+  IsMongoId,
+  IsOptional,
   IsString,
   ValidateBy,
   ValidationOptions,
@@ -15,8 +17,6 @@ export class CreateAppointmentDto {
   @IsMimeType()
   mimeType: string;
 }
-
-export class UpdateAppointmentDto extends CreateAppointmentDto {}
 
 export function IsGoogleStorageUrl(validationOptions?: ValidationOptions) {
   return ValidateBy(
@@ -35,4 +35,14 @@ export function IsGoogleStorageUrl(validationOptions?: ValidationOptions) {
     },
     validationOptions,
   );
+}
+
+export class UpdateAppointmentDto {
+  @IsString()
+  @IsOptional()
+  country: string;
+
+  @IsString()
+  @IsMongoId()
+  appointmentId: string;
 }

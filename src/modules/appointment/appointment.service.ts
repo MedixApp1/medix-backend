@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Appointment, AppointmentDocument } from './appointment.schema';
 import { Model } from 'mongoose';
-import { CreateAppointmentDto } from './dto/appointment.dto';
+import {
+  CreateAppointmentDto,
+  UpdateAppointmentDto,
+} from './dto/appointment.dto';
 import { Gemini } from 'src/common/utils/gemini';
 import { UserService } from '../user/user.service';
 
@@ -31,5 +34,42 @@ export class AppointmentService {
 
   async getAppointmentById(id: string): Promise<Appointment> {
     return await this.appointmentModel.findById(id);
+  }
+
+  async createAppointmentNote(body: UpdateAppointmentDto) {
+    const { appointmentId, country } = body;
+    const currentAppointment =
+      await this.appointmentModel.findById(appointmentId);
+
+    if (!currentAppointment) {
+      throw new BadRequestException('Invalid Appointment ID');
+    }
+    const newNote = await this.geminiService.generateNotesFromTranscript(
+      currentAppointment.transcript.join('/n'),
+      country,
+    );
+    console.log(newNote);
+    const updatedAppointment = await this.appointmentModel.findByIdAndUpdate(
+      appointmentId,
+      {
+        note: newNote,
+      },
+      { new: true },
+    );
+    return updatedAppointment;
+  }
+
+  async createAppointmentPatientInstructions(body: UpdateAppointmentDto) {
+    const { appointmentId } = body;
+    const currentAppointment =
+      await this.appointmentModel.findById(appointmentId);
+    if (!currentAppointment) {
+      throw new BadRequestException('Invalid Appointment ID');
+    }
+    const newPatientInstructions = await this.geminiService.generatePatientInstructionsfFromTranscript(currentAppointment.transcript.join('/n'));
+  const updatedAppointment=await this.appointmentModel.findByIdAndUpdate(appointmentId, {
+    patientInstructions: newPatientInstructions,
+  }, { new: true });
+  return updatedAppointment
   }
 }

@@ -176,69 +176,140 @@ export class Gemini {
     }
     return text.slice(start, end);
   }
-  async generateNotesFromTranscript(url: string, mimeType: string) {
-    const functionDeclarations: Tool[] = [
-      {
-        functionDeclarations: [
-          {
-            name: 'generate_medical_notes',
-            description: 'generate medical notes from audio',
-            parameters: {
-              type: FunctionDeclarationSchemaType.OBJECT,
-              properties: {
-                text: { type: FunctionDeclarationSchemaType.STRING },
-                speaker: { type: FunctionDeclarationSchemaType.STRING },
-                start_offset_ms: { type: FunctionDeclarationSchemaType.NUMBER },
-                end_offset_ms: { type: FunctionDeclarationSchemaType.NUMBER },
-              },
-              required: ['text', 'speaker', 'start_offset_ms', 'end_offset_ms'],
-            },
-          },
-        ],
-      },
-    ];
-    const toolConfig = {
-      function_calling_config: {
-        mode: 'ANY',
-        allowed_function_names: ['generate_transcript'],
-      },
-    };
+  async generateNotesFromTranscript(transcript: string, country: string) {
     const generationConfig = {
       temperature: 0.95,
       topP: 1.0,
       maxOutputTokens: 8192,
     };
 
-    const filePart = {
-      fileData: {
-        fileUri: url,
-        mimeType: mimeType,
-      },
-    };
-    const textPart = {
-      text: `Generate transcription with timestamps from the audio, only extract speech and ignore background audio.`,
-    };
-
     const request = {
-      contents: [{ role: 'user', parts: [filePart, textPart] }],
-      tools: functionDeclarations,
-      toolConfig: toolConfig,
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `Convert the following doctor-patient conversation transcript into structured medical notes`,
+            },
+            {
+              text: ` transcript: 
+              ${transcript}`,
+            },
+          ],
+        },
+      ],
       generationConfig: generationConfig,
     };
 
     const model = this.vertexAI.preview.getGenerativeModel({
       model: 'gemini-1.5-flash-001',
       systemInstruction: {
-        role: 'Medical Transcription AI',
+        role: 'Medical Notes AI',
         parts: [
           {
-            text: `You are a medical AI that converts doctor-patient conversations into structured clinical notes.`,
+            text: `You are a medical notes AI that converts doctor-patient conversation transcript into structured medical notes using this JSON format`,
           },
           {
-            text: `Extract relevant medical information, use appropriate terminology, and organize into the specified JSON format.`,
+            text: `The JSON format:
+            {
+    "note": {
+        "title": "Encounter",
+        "sections": [
+            {
+                "key": "CHIEF_COMPLAINT",
+                "title": "Chief complaint",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "HISTORY_OF_PRESENT_ILLNESS",
+                "title": "History of present illness",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "PAST_MEDICAL_HISTORY",
+                "title": "Past medical history",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "CURRENT_MEDICATIONS",
+                "title": "Current medications",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "ALLERGIES",
+                "title": "Allergies",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "REVIEW_OF_SYSTEMS",
+                "title": "Review of systems",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "PHYSICAL_EXAMINATION",
+                "title": "Physical examination",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "ASSESSMENT",
+                "title": "Assessment",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "PLAN",
+                "title": "Plan",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "PRESCRIPTION",
+                "title": "Prescription",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "FOLLOW_UP",
+                "title": "Follow-up",
+                "text": "",
+                "content": []
+            },
+            {
+                "key": "SOCIAL_HISTORY",
+                "title": "Social history",
+                "text": "",
+                "content": []
+            }
+        ]
+    },
+    "suggested_dot_phrases": null
+}`,
+          },
+
+          {
+            text: `For each section:`,
           },
           {
-            text: `Maintain confidentiality, focus on medical details, and leave sections empty if no relevant information is available.`,
+            text: `Extract relevant information from the transcript.`,
+          },
+          {
+            text: `Populate the "text" field with a bulleted list of key points, using "\n" for line breaks.`,
+          },
+          {
+            text: `Populate the "content" array with individual items from the bulleted list.`,
+          },
+          {
+            text: `If a section has no relevant information, leave "text" as an empty string and "content" as an empty array`,
+          },
+          {
+            text: `Use appropriate medical terminology`,
           },
           {
             text: `Aim for clear, concise notes useful for healthcare providers.`,
@@ -247,7 +318,138 @@ export class Gemini {
       },
     });
     const resp = await model.generateContent(request);
-    const contentResponse = resp.response.candidates[0].content;
-    return contentResponse;
+    const contentResponse = resp.response.candidates[0].content.parts[0].text;
+    console.log(contentResponse);
+    const jsonContent = this.extractJson(contentResponse);
+    console.log(jsonContent);
+    return jsonContent;
+  }
+
+  async generatePatientInstructionsfFromTranscript(transcript: string) {
+    const generationConfig = {
+      temperature: 0.95,
+      topP: 1.0,
+      maxOutputTokens: 8192,
+    };
+
+    const functionDeclarations: Tool[] = [
+      {
+        functionDeclarations: [
+          {
+            name: 'get_patient_medication',
+            description: 'get the patient medication from transcript',
+            parameters: {
+              type: FunctionDeclarationSchemaType.OBJECT,
+              properties: {
+                action: { type: FunctionDeclarationSchemaType.STRING },
+                details: { type: FunctionDeclarationSchemaType.STRING },
+              },
+              required: ['action', 'details'],
+            },
+          },
+          {
+            name: 'get_patient_lifestyle_changes',
+            description: 'get the patient lifestyle changes from transcript',
+            parameters: {
+              type: FunctionDeclarationSchemaType.OBJECT,
+              properties: {
+                action: { type: FunctionDeclarationSchemaType.STRING },
+                details: { type: FunctionDeclarationSchemaType.STRING },
+              },
+              required: ['action', 'details'],
+            },
+          },
+          {
+            name: 'get_patient_follow_up',
+            description: 'get the patient follow up from transcript',
+            parameters: {
+              type: FunctionDeclarationSchemaType.OBJECT,
+              properties: {
+                action: { type: FunctionDeclarationSchemaType.STRING },
+                details: { type: FunctionDeclarationSchemaType.STRING },
+              },
+              required: ['action', 'details'],
+            },
+          },
+          {
+            name: 'get_patient_other_instructions',
+            description: 'get the patient other instructions from transcript',
+            parameters: {
+              type: FunctionDeclarationSchemaType.OBJECT,
+              properties: {
+                action: { type: FunctionDeclarationSchemaType.STRING },
+                details: { type: FunctionDeclarationSchemaType.STRING },
+              },
+              required: ['action', 'details'],
+            },
+          },
+        ],
+      },
+    ];
+    const toolConfig = {
+      function_calling_config: {
+        mode: 'ANY',
+        // allowed_function_names: [
+        //   'get_patient_medication',
+        //   'get_patient_lifestyle_changes',
+        //   'get_patient_follow_up',
+        //   'get_patient_other_instructions',
+        // ],
+      },
+    };
+    const request = {
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `Generate instructions and next steps for patients from the following transcript`,
+            },
+            {
+              text: `${transcript}`,
+            },
+          ],
+        },
+      ],
+      tools: functionDeclarations,
+      toolConfig: toolConfig,
+      generationConfig: generationConfig,
+    };
+
+    const model = this.vertexAI.preview.getGenerativeModel({
+      model: 'gemini-1.5-flash-001',
+      systemInstruction: {
+        role: 'Patient Instructions AI',
+        parts: [
+          {
+            text: `You are a patient instructions AI that generates instructions and next steps for patients from doctor-patient consultation based on a transcript sent by the user`,
+          },
+        ],
+      },
+      safetySettings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+        {
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_NONE,
+        },
+      ],
+    });
+    const resp = await model.generateContent(request);
+    const contentResponse = resp.response.candidates[0].content.parts[0].text;
+    console.log(resp.response.candidates[0].content.parts[0]);
+    const stringe = this.extractJson(contentResponse);
+    console.log(stringe);
+    return stringe;
   }
 }
