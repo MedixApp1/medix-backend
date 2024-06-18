@@ -10,7 +10,8 @@ import {
 } from '@google-cloud/vertexai';
 import { Injectable } from '@nestjs/common';
 import { Appointment } from 'src/modules/appointment/appointment.schema';
-
+import { Stream } from 'stream';
+import * as stream from 'stream';
 @Injectable()
 export class Gemini {
   apiKey: string;
@@ -50,34 +51,70 @@ export class Gemini {
     });
     this.fileManager = new GoogleAIFileManager(this.apiKey);
   }
+
+  // [END storage_stream_file_upload]
+  
   async uploadFile(file: Express.Multer.File, mimeType: string) {
     const storage = new Storage({
       projectId: apiKey.project_id,
       keyFilename: ENVIRONMENT.GOOGLE.CLOUD.API_KEY,
     });
 
-    const bucket = storage.bucket('medix-audio');
-
-    const newFilename = `medix_audio_${Date.now()}`;
-    const newFile = bucket.file(newFilename);
-
     try {
-      await newFile.save(file.buffer, {
-        contentType: mimeType,
-        metadata: {
-          cacheControl: 'public, max-age=31536000',
-        },
+      const bucket = storage.bucket('medix-audio');
+      
+      const newFilename = `medix_audio_${Date.now()}`;
+      const newFile = bucket.file(newFilename);
+      const passThroughStream = new stream.PassThrough();
+
+      passThroughStream.write(file.buffer, (error) => {
+        console.log(error);
       });
+      passThroughStream
+      .on('pipe', () => {
+        console.log('upload started');
+      })
+      .on('error', () => {
+        console.log('error dey');
+      });
+      passThroughStream.end();
+      
+      async function streamFileUpload() {
+        passThroughStream.pipe(newFile.createWriteStream()).on('finish', () => {
+          // The file upload is complete
+        });
+    
+        return 'successs';
+      }
+      streamFileUpload().catch(console.error);
+      passThroughStream
+      .pipe(newFile.createWriteStream())
+      .on('finish', () => {
+        return {
+            name: newFilename,
+            size: (file.size / (1024 * 1024)).toFixed(2),
+            mimeType: file.mimetype,
+            publicUrl: `https://storage.cloud.google.com/medix-audio/${newFilename}`,
+            url: `gs://medix-audio/${newFilename}`,
+          };
+        })
+        .on('close', () => console.log('file stopped'))
+        .on('drain', () => console.log('drained'));
+      // await newFile.save(file.buffer, {
+      //   contentType: mimeType,
+      //   gzip: true,
+      //   metadata: {
+      //     cacheControl: 'public, max-age=31536000',
+      //   },
+      // });
 
-      console.log(`${file.originalname} uploaded to medix-audio🎉`);
-
-      return {
-        name: newFilename,
-        size: (file.size / (1024 * 1024)).toFixed(2),
-        mimeType: file.mimetype,
-        publicUrl: `https://storage.cloud.google.com/medix-audio/${newFilename}`,
-        url: `gs://medix-audio/${newFilename}`,
-      };
+      // return {
+      //   name: newFilename,
+      //   size: (file.size / (1024 * 1024)).toFixed(2),
+      //   mimeType: file.mimetype,
+      //   publicUrl: `https://storage.cloud.google.com/medix-audio/${newFilename}`,
+      //   url: `gs://medix-audio/${newFilename}`,
+      // };
     } catch (error) {
       console.error('ERROR:', error);
     }
