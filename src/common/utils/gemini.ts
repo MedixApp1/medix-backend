@@ -175,14 +175,13 @@ export class Gemini {
     }
     return text.slice(start, end);
   }
-  async generateNotesFromTranscript(transcript: string, country: string) {
+  async generateNotesFromTranscript(transcript: string) {
     const generationConfig = {
       temperature: 0.95,
       topP: 1.0,
       maxOutputTokens: 8192,
       response_mime_type: 'application/json',
     };
-
     const request = {
       contents: [
         {
@@ -213,7 +212,7 @@ export class Gemini {
             text: `The JSON format:
             {
     "note": {
-        "title": "Encounter",
+        "title": "(suggest a title name that's simple)",
         "sections": [
             {
                 "key": "CHIEF_COMPLAINT",
@@ -419,33 +418,31 @@ export class Gemini {
             Convert the following doctor-patient conversation transcript into structured patient instructions in JSON format. Focus on actionable items, medications, lifestyle changes, and follow-up recommendations. Use this structure:
 
 {
-  "patient_instructions": {
-    "message_from_doctor": "",
+    "messageFromDoctor": "",
     "medication": [
       {
         "action": "",
         "details": ""
       }
     ],
-    "lifestyle_changes": [
+    "lifestyleChanges": [
       {
         "action": "",
         "details": ""
       }
     ],
-    "follow_up": [
+    "followUp": [
       {
         "action": "",
         "details": ""
       }
     ],
-    "other_instructions": [
+    "otherInstructions": [
       {
         "action": "",
         "details": ""
       }
     ]
-  }
 }
 
 For the "message_from_doctor" field, include a brief, kind message summarizing the visit and offering encouragement to the patient.
@@ -476,10 +473,7 @@ Ensure each instruction is clear, concise, and directly related to the patient's
     const resp = await model.generateContent(request);
     const contentResponse = resp.response.candidates[0].content.parts[0].text;
     console.log(resp.response.candidates[0].content.parts[0]);
-    const stringe = contentResponse
-      .replace(/```json\n/, '')
-      .replace(/\n```$/, '');
-    console.log(stringe);
+    const stringe = JSON.parse(contentResponse)
     return stringe;
   }
 }

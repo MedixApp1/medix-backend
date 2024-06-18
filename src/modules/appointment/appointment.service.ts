@@ -46,7 +46,6 @@ export class AppointmentService {
     }
     const { note } = await this.geminiService.generateNotesFromTranscript(
       currentAppointment.transcript.join('/n'),
-      country,
     );
     const updatedAppointment = await this.appointmentModel.findByIdAndUpdate(
       appointmentId,
@@ -60,19 +59,22 @@ export class AppointmentService {
 
   async createAppointmentPatientInstructions(body: UpdateAppointmentDto) {
     const { appointmentId } = body;
+
     const currentAppointment =
       await this.appointmentModel.findById(appointmentId);
+
     if (!currentAppointment) {
       throw new BadRequestException('Invalid Appointment ID');
     }
-    const newPatientInstructions =
+    const patientInstructions =
       await this.geminiService.generatePatientInstructionsfFromTranscript(
         currentAppointment.transcript.join('/n'),
       );
+    console.log(patientInstructions)
     const updatedAppointment = await this.appointmentModel.findByIdAndUpdate(
       appointmentId,
       {
-        patientInstructions: newPatientInstructions,
+        patientInstructions: patientInstructions,
       },
       { new: true },
     );

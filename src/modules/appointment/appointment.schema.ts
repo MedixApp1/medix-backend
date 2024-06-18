@@ -23,8 +23,31 @@ export class Appointment {
   note: Record<string, any>;
   @Prop(
     raw({
-      action: String,
-      details: String,
+      messageFromDoctor: String,
+      medication: [
+        {
+          action: String,
+          details: String,
+        },
+      ],
+      lifestyleChanges: [
+        {
+          action: String,
+          details: String,
+        },
+      ],
+      followUp: [
+        {
+          action: String,
+          details: String,
+        },
+      ],
+      otherInstructions: [
+        {
+          action: String,
+          details: String,
+        },
+      ],
     }),
   )
   patientInstructions: Record<string, any>;
