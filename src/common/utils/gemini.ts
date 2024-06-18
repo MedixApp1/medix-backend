@@ -53,7 +53,7 @@ export class Gemini {
   }
 
   // [END storage_stream_file_upload]
-  
+
   async uploadFile(file: Express.Multer.File, mimeType: string) {
     const storage = new Storage({
       projectId: apiKey.project_id,
@@ -62,7 +62,7 @@ export class Gemini {
 
     try {
       const bucket = storage.bucket('medix-audio');
-      
+
       const newFilename = `medix_audio_${Date.now()}`;
       const newFile = bucket.file(newFilename);
       const passThroughStream = new stream.PassThrough();
@@ -71,26 +71,26 @@ export class Gemini {
         console.log(error);
       });
       passThroughStream
-      .on('pipe', () => {
-        console.log('upload started');
-      })
-      .on('error', () => {
-        console.log('error dey');
-      });
+        .on('pipe', () => {
+          console.log('upload started');
+        })
+        .on('error', () => {
+          console.log('error dey');
+        });
       passThroughStream.end();
-      
+
       async function streamFileUpload() {
         passThroughStream.pipe(newFile.createWriteStream()).on('finish', () => {
           // The file upload is complete
         });
-    
+
         return 'successs';
       }
-      streamFileUpload().catch(console.error)
+      streamFileUpload().catch(console.error);
       passThroughStream
-      .pipe(newFile.createWriteStream())
-      .on('finish', () => {
-        return {
+        .pipe(newFile.createWriteStream())
+        .on('finish', () => {
+          return {
             name: newFilename,
             size: (file.size / (1024 * 1024)).toFixed(2),
             mimeType: file.mimetype,
