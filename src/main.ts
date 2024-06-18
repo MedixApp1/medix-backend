@@ -7,6 +7,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filter/filter';
 import { ENVIRONMENT } from './common/configs/environment';
 import { ResponseTransformerInterceptor } from './common/interceptors/response.interceptor';
+import compression from 'compression'
 // import { audioToText } from './common/utils/speechmatics';
 // import { readFileSync } from 'fs';
 
@@ -18,6 +19,7 @@ async function bootstrap() {
 
   app.use(helmet());
   app.use(express.json({ limit: '50mb' }));
+  // app.use(compression())
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   /**
