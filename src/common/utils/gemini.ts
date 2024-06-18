@@ -86,7 +86,7 @@ export class Gemini {
     
         return 'successs';
       }
-      streamFileUpload().catch(console.error);
+      streamFileUpload().catch(console.error)
       passThroughStream
       .pipe(newFile.createWriteStream())
       .on('finish', () => {
