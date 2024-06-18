@@ -9,9 +9,7 @@ import {
   VertexAI,
 } from '@google-cloud/vertexai';
 import { Injectable } from '@nestjs/common';
-import {
-  Appointment,
-} from 'src/modules/appointment/appointment.schema';
+import { Appointment } from 'src/modules/appointment/appointment.schema';
 
 @Injectable()
 export class Gemini {
@@ -58,33 +56,27 @@ export class Gemini {
       keyFilename: ENVIRONMENT.GOOGLE.CLOUD.API_KEY,
     });
 
-    const bucket = storage.bucket('medix-conversation-audio');
+    const bucket = storage.bucket('medix-audio');
 
-    // Create a reference to a file object
-    const newFile = bucket.file(file.originalname);
+    const newFilename = `medix_audio_${Date.now()}`;
+    const newFile = bucket.file(newFilename);
 
-    // Upload the buffer to the file
     try {
       await newFile.save(file.buffer, {
-        contentType: mimeType, // Adjust this based on your file type
+        contentType: mimeType,
         metadata: {
-          // Optional metadata
           cacheControl: 'public, max-age=31536000',
         },
       });
 
-      console.log(
-        `${file.originalname} uploaded to ${'medix-conversation-audio'}.`,
-      );
-      const [metadata] = await newFile.getMetadata();
-      console.log(metadata);
+      console.log(`${file.originalname} uploaded to medix-audio🎉`);
 
       return {
-        name: metadata.name,
-        size: metadata.size,
-        mimeType: metadata.contentType,
-        publicUrl: `https://storage.cloud.google.com/medix-conversation-audio/${metadata.name}`,
-        url: `gs://${metadata.bucket}/${metadata.name}`,
+        name: newFilename,
+        size: (file.size / (1024 * 1024)).toFixed(2),
+        mimeType: file.mimetype,
+        publicUrl: `https://storage.cloud.google.com/medix-audio/${newFilename}`,
+        url: `gs://medix-audio/${newFilename}`,
       };
     } catch (error) {
       console.error('ERROR:', error);
@@ -473,7 +465,7 @@ Ensure each instruction is clear, concise, and directly related to the patient's
     const resp = await model.generateContent(request);
     const contentResponse = resp.response.candidates[0].content.parts[0].text;
     console.log(resp.response.candidates[0].content.parts[0]);
-    const stringe = JSON.parse(contentResponse)
+    const stringe = JSON.parse(contentResponse);
     return stringe;
   }
 }
