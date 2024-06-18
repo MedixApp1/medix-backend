@@ -84,7 +84,7 @@ export class Gemini {
           // The file upload is complete
         });
 
-        return 'successs';
+        return 'successs'
       }
       streamFileUpload().catch(console.error);
       passThroughStream
