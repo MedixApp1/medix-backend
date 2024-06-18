@@ -34,7 +34,7 @@ export class AppointmentController {
     const uploadResult = await this.geminiService.uploadFile(
       file,
       file.mimetype,
-    );
+    ) as unknown as string
     if (!uploadResult) {
       throw new BadRequestException(
         'Error in uploading audio to cloud storage',
