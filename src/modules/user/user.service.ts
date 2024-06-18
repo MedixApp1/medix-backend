@@ -22,6 +22,13 @@ export class UserService {
     return await this.userModel.findById(userId).select('-password');
   }
 
+  async getAllAppointmentsByUser(userId: string) {
+    return await this.userModel
+      .findById(userId)
+      .select('-password')
+      .populate('appointments');
+  }
+
   async getUserByEmailIncludePassword(email: string) {
     return await this.userModel.findOne({ email }).select('+password');
   }

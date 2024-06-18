@@ -32,6 +32,10 @@ export class AppointmentService {
     return newAppointment;
   }
 
+  async getAllAppointmentsByUser(userId: string) {
+    return await this.userService.getAllAppointmentsByUser(userId)
+  }
+
   async getAppointmentById(id: string): Promise<Appointment> {
     return await this.appointmentModel.findById(id);
   }
