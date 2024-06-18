@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Put, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ResponseMessage } from 'src/common/decorators/response.decorator';
 import { RESPONSE_CONSTANT } from 'src/common/constants/response.constant';
@@ -27,6 +21,12 @@ export class UserController {
     return this.userService.getUser(user.id);
   }
 
+  @Get('/appointments')
+  @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.GET_APPOINTMENT_SUCCESS)
+  async getAllUserAppointments(@LoggedInUserDecorator() user: any) {
+    return this.getAllUserAppointments(user.id);
+  }
+
   @Put('/')
   @ResponseMessage(RESPONSE_CONSTANT.USER.UPDATE_USER_SUCCESS)
   async updateUser(@LoggedInUserDecorator() user: any, payload: UpdateUserDto) {
@@ -38,6 +38,4 @@ export class UserController {
   async deleteUser(@LoggedInUserDecorator() user: any) {
     return this.userService.deleteUser(user.id);
   }
-
-  
 }
