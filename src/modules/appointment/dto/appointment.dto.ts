@@ -46,3 +46,9 @@ export class UpdateAppointmentDto {
   @IsMongoId()
   appointmentId: string;
 }
+
+export class DeleteAppointmentDto {
+  @IsString()
+  @IsMongoId()
+  appointmentId: string;
+}

@@ -2,9 +2,11 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
+  Put,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -12,6 +14,7 @@ import {
 import { AppointmentService } from './appointment.service';
 import {
   CreateAppointmentDto,
+  DeleteAppointmentDto,
   UpdateAppointmentDto,
 } from './dto/appointment.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -33,10 +36,10 @@ export class AppointmentController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadAudio(@UploadedFile() file: Express.Multer.File) {
     console.log(file);
-    const uploadResult = await this.geminiService.uploadFile(
+    const uploadResult = (await this.geminiService.uploadFile(
       file,
       file.mimetype,
-    ) as unknown as string
+    )) as unknown as string;
     if (!uploadResult) {
       throw new BadRequestException(
         'Error in uploading audio to cloud storage',
@@ -85,9 +88,7 @@ export class AppointmentController {
     @Body() body: UpdateAppointmentDto,
   ) {
     const newAppointment =
-      await this.appointmentService.createAppointmentPatientInstructions(
-        body,
-      );
+      await this.appointmentService.createAppointmentPatientInstructions(body);
 
     if (!newAppointment) {
       throw new BadRequestException('Failed to create appointment');
@@ -96,7 +97,18 @@ export class AppointmentController {
   }
   @Get('/:id')
   @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.GET_APPOINTMENT_SUCCESS)
-  async getAppointmentById(@Param() id: string){
-    return this.appointmentService.getAppointmentById(id)
+  async getAppointmentById(@Param() id: string) {
+    return this.appointmentService.getAppointmentById(id);
+  }
+
+  @Put('/')
+  async updateAppointment(@Body() body) {
+    const { appointmentId, details } = body;
+    return this.appointmentService.updateAppointment(appointmentId, details);
+  }
+
+  @Delete('/')
+  async deleteAppointment(@Param() payload: DeleteAppointmentDto) {
+    this.appointmentService.deleteAppointment(payload);
   }
 }

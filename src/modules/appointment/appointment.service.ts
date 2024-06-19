@@ -4,6 +4,7 @@ import { Appointment, AppointmentDocument } from './appointment.schema';
 import { Model } from 'mongoose';
 import {
   CreateAppointmentDto,
+  DeleteAppointmentDto,
   UpdateAppointmentDto,
 } from './dto/appointment.dto';
 import { Gemini } from 'src/common/utils/gemini';
@@ -80,9 +81,14 @@ export class AppointmentService {
     return await this.appointmentModel.findById(id);
   }
 
-  async updateAppointment(appointmentId, body: any) {
+  async updateAppointment(appointmentId: DeleteAppointmentDto, body: any) {
     return this.appointmentModel.findByIdAndUpdate(appointmentId, body, {
       new: true,
     });
+  }
+
+  async deleteAppointment(payload: DeleteAppointmentDto) {
+    const {appointmentId} = payload
+    return this.appointmentModel.findByIdAndDelete(appointmentId);
   }
 }
