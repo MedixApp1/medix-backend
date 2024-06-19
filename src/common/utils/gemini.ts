@@ -114,6 +114,15 @@ export class Gemini {
             ["Hi doctor", I am feeling unwell", "When did it start?"]
             `,
           },
+          {
+            text: `Extract relevant information from the transcript.`,
+          },
+          {
+            text: `If a section has no relevant information, leave "text" as an empty string.`,
+          },
+          {
+            text: `Use appropriate medical terminology.`,
+          },
         ],
       },
     });
@@ -122,58 +131,7 @@ export class Gemini {
     const stringe = JSON.parse(contentResponse);
     return stringe;
   }
-  extractJson(textResponse) {
-    // This pattern matches a string that starts with '{' and ends with '}'
-    const pattern = /\{[^{}]*\}/g;
 
-    let match;
-    const jsonObjects = [];
-
-    while ((match = pattern.exec(textResponse)) !== null) {
-      const jsonStr = match[0];
-      try {
-        // Validate if the extracted string is valid JSON
-        const jsonObj = JSON.parse(jsonStr);
-        jsonObjects.push(jsonObj);
-      } catch (error) {
-        // Extend the search for nested structures
-        const extendedJsonStr = this.extendSearch(textResponse, [
-          match.index,
-          pattern.lastIndex,
-        ]);
-        try {
-          const jsonObj = JSON.parse(extendedJsonStr);
-          jsonObjects.push(jsonObj);
-        } catch (error) {
-          // Handle cases where the extraction is not valid JSON
-          continue;
-        }
-      }
-    }
-
-    if (jsonObjects.length > 0) {
-      return jsonObjects;
-    } else {
-      return null; // Or handle this case as you prefer
-    }
-  }
-
-  extendSearch(text, span) {
-    // Extend the search to try to capture nested structures
-    const [start, end] = span;
-    let nestCount = 0;
-    for (let i = start; i < text.length; i++) {
-      if (text[i] === '{') {
-        nestCount++;
-      } else if (text[i] === '}') {
-        nestCount--;
-        if (nestCount === 0) {
-          return text.slice(start, i + 1);
-        }
-      }
-    }
-    return text.slice(start, end);
-  }
   async generateNotesFromTranscript(transcript: string) {
     const generationConfig = {
       temperature: 0.95,
@@ -193,6 +151,7 @@ export class Gemini {
               text: ` transcript: 
               ${transcript}`,
             },
+            
           ],
         },
       ],
@@ -319,12 +278,6 @@ export class Gemini {
     const contentResponse = JSON.parse(
       resp.response.candidates[0].content.parts[0].text,
     );
-    console.log(contentResponse);
-    // let jsonContent = contentResponse
-    //   .replace(/```json\n/, '')
-    //   .replace(/\n```$/, '');
-    // jsonContent = JSON.parse(jsonContent);
-    // console.log(jsonContent, 'stuff');
     return contentResponse as unknown as Appointment['note'];
   }
 
@@ -336,60 +289,6 @@ export class Gemini {
       response_mime_type: 'application/json',
     };
 
-    // const functionDeclarations: Tool[] = [
-    //   {
-    //     functionDeclarations: [
-    //       {
-    //         name: 'get_patient_medication',
-    //         description: 'get the patient medication from transcript',
-    //         parameters: {
-    //           type: FunctionDeclarationSchemaType.OBJECT,
-    //           properties: {
-    //             action: { type: FunctionDeclarationSchemaType.STRING },
-    //             details: { type: FunctionDeclarationSchemaType.STRING },
-    //           },
-    //           required: ['action', 'details'],
-    //         },
-    //       },
-    //       {
-    //         name: 'get_patient_lifestyle_changes',
-    //         description: 'get the patient lifestyle changes from transcript',
-    //         parameters: {
-    //           type: FunctionDeclarationSchemaType.OBJECT,
-    //           properties: {
-    //             action: { type: FunctionDeclarationSchemaType.STRING },
-    //             details: { type: FunctionDeclarationSchemaType.STRING },
-    //           },
-    //           required: ['action', 'details'],
-    //         },
-    //       },
-    //       {
-    //         name: 'get_patient_follow_up',
-    //         description: 'get the patient follow up from transcript',
-    //         parameters: {
-    //           type: FunctionDeclarationSchemaType.OBJECT,
-    //           properties: {
-    //             action: { type: FunctionDeclarationSchemaType.STRING },
-    //             details: { type: FunctionDeclarationSchemaType.STRING },
-    //           },
-    //           required: ['action', 'details'],
-    //         },
-    //       },
-    //       {
-    //         name: 'get_patient_other_instructions',
-    //         description: 'get the patient other instructions from transcript',
-    //         parameters: {
-    //           type: FunctionDeclarationSchemaType.OBJECT,
-    //           properties: {
-    //             action: { type: FunctionDeclarationSchemaType.STRING },
-    //             details: { type: FunctionDeclarationSchemaType.STRING },
-    //           },
-    //           required: ['action', 'details'],
-    //         },
-    //       },
-    //     ],
-    //   },
-    // ];
     const request = {
       contents: [
         {
@@ -442,11 +341,13 @@ export class Gemini {
         "details": ""
       }
     ]
-}
-
-For the "message_from_doctor" field, include a brief, kind message summarizing the visit and offering encouragement to the patient.
-
-Ensure each instruction is clear, concise, and directly related to the patient's care. If a category has no relevant instructions, leave it as an empty array.`,
+}`,
+          },
+          {
+            text: `For the "message_from_doctor" field, include a brief, kind message summarizing the visit and offering encouragement to the patient.`,
+          },
+          {
+            text: `Ensure each instruction is clear, concise, and directly related to the patient's care. If a category has no relevant instructions, leave it as an empty array.`,
           },
         ],
       },
@@ -471,7 +372,6 @@ Ensure each instruction is clear, concise, and directly related to the patient's
     });
     const resp = await model.generateContent(request);
     const contentResponse = resp.response.candidates[0].content.parts[0].text;
-    console.log(resp.response.candidates[0].content.parts[0]);
     const stringe = JSON.parse(contentResponse);
     return stringe;
   }
