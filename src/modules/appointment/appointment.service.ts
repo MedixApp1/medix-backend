@@ -32,14 +32,6 @@ export class AppointmentService {
     return newAppointment;
   }
 
-  async getAllAppointmentsByUser(userId: string) {
-    return await this.userService.getAllAppointmentsByUser(userId)
-  }
-
-  async getAppointmentById(id: string): Promise<Appointment> {
-    return await this.appointmentModel.findById(id);
-  }
-
   async createAppointmentNote(body: UpdateAppointmentDto) {
     const { appointmentId, country } = body;
     const currentAppointment =
@@ -74,7 +66,7 @@ export class AppointmentService {
       await this.geminiService.generatePatientInstructionsfFromTranscript(
         currentAppointment.transcript.join('/n'),
       );
-    console.log(patientInstructions)
+    console.log(patientInstructions);
     const updatedAppointment = await this.appointmentModel.findByIdAndUpdate(
       appointmentId,
       {
@@ -83,5 +75,14 @@ export class AppointmentService {
       { new: true },
     );
     return updatedAppointment;
+  }
+  async getAppointmentById(id: string): Promise<Appointment> {
+    return await this.appointmentModel.findById(id);
+  }
+
+  async updateAppointment(appointmentId, body: any) {
+    return this.appointmentModel.findByIdAndUpdate(appointmentId, body, {
+      new: true,
+    });
   }
 }

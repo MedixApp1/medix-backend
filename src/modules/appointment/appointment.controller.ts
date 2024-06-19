@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   UploadedFile,
   UseGuards,
@@ -91,5 +93,10 @@ export class AppointmentController {
       throw new BadRequestException('Failed to create appointment');
     }
     return newAppointment;
+  }
+  @Get('/:id')
+  @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.GET_APPOINTMENT_SUCCESS)
+  async getAppointmentById(@Param() id: string){
+    return this.appointmentService.getAppointmentById(id)
   }
 }

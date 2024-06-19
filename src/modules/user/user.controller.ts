@@ -24,7 +24,7 @@ export class UserController {
   @Get('/appointments')
   @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.GET_APPOINTMENT_SUCCESS)
   async getAllUserAppointments(@LoggedInUserDecorator() user: any) {
-    return this.getAllUserAppointments(user.id);
+    return this.userService.getAllAppointmentsByUser(user.id);
   }
 
   @Put('/')

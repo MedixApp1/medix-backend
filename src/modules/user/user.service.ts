@@ -25,8 +25,8 @@ export class UserService {
   async getAllAppointmentsByUser(userId: string) {
     return await this.userModel
       .findById(userId)
-      .select('-password')
-      .populate('appointments');
+      .populate('appointments')
+      .select('-password');
   }
 
   async getUserByEmailIncludePassword(email: string) {
