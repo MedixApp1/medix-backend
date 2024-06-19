@@ -93,9 +93,16 @@ export class Gemini {
     const textPart = {
       text: `audio`,
     };
+    const generationConfig = {
+      temperature: 0.95,
+      topP: 1.0,
+      maxOutputTokens: 8192,
+      response_mime_type: 'application/json',
+    };
 
     const request = {
       contents: [{ role: 'user', parts: [filePart, textPart] }],
+      generationConfig,
     };
     const generativeModel = this.vertexAI.getGenerativeModel({
       model: 'gemini-1.5-flash-001',
