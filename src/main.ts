@@ -18,7 +18,7 @@ async function bootstrap() {
     cors: true,
   });
   const apiToolkitClient = APIToolkit.NewClient({
-    apiKey: 'lfIaKscfOiozm9FIh6ZsSGoZ9GLDG9Se67m83L8NqmtVoIrH',
+    apiKey: ENVIRONMENT.APITOOLKIT.API_KEY,
     debug: false,
     tags: ['environment: production', 'region: us-east-1'],
     serviceVersion: 'v2.0',
