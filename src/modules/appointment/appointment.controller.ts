@@ -31,32 +31,33 @@ export class AppointmentController {
     private readonly appointmentService: AppointmentService,
     private readonly geminiService: Gemini,
   ) {}
-  @Post('/audio/upload')
-  @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.UPLOAD_AUDIO_SUCCESS)
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadAudio(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-    const uploadResult = (await this.geminiService.uploadFile(
-      file,
-      file.mimetype,
-    )) as unknown as string;
-    if (!uploadResult) {
-      throw new BadRequestException(
-        'Error in uploading audio to cloud storage',
-      );
-    }
-    return uploadResult;
-  }
+  // @Post('/audio/upload')
+  // @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.UPLOAD_AUDIO_SUCCESS)
+  // @UseInterceptors(FileInterceptor('file'))
+  // async uploadAudio(@UploadedFile() file: Express.Multer.File) {
+  //   console.log(file);
+  //   const uploadResult = (await this.geminiService.uploadFile(
+  //     file,
+  //     file.mimetype,
+  //   )) as unknown as string;
+  //   if (!uploadResult) {
+  //     throw new BadRequestException(
+  //       'Error in uploading audio to cloud storage',
+  //     );
+  //   }
+  //   return uploadResult;
+  // }
 
   @Post('/')
+  @UseInterceptors(FileInterceptor('file'))
   @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.CREATE_APPOINTMENT_SUCCESS)
   async createAppointment(
-    @Body() body: CreateAppointmentDto,
+    @UploadedFile() file: Express.Multer.File,
     @LoggedInUserDecorator() user: { id: string },
   ) {
     const newAppointment = await this.appointmentService.createAppointment(
       user.id,
-      body,
+      file,
     );
 
     if (!newAppointment) {
