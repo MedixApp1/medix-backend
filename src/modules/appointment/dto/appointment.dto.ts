@@ -38,9 +38,6 @@ export function IsGoogleStorageUrl(validationOptions?: ValidationOptions) {
 }
 
 export class UpdateAppointmentDto {
-  @IsString()
-  @IsOptional()
-  country: string;
 
   @IsString()
   @IsMongoId()

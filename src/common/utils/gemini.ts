@@ -42,6 +42,7 @@ export class Gemini {
     {
       "note": {
         "title": "(suggest a title name that's simple)",
+        "description": "(suggest a description that's simple)",
         "sections": [
           {
             "key": "CHIEF_COMPLAINT",

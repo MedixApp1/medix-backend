@@ -34,7 +34,7 @@ export class AppointmentService {
   }
 
   async createAppointmentNote(body: UpdateAppointmentDto) {
-    const { appointmentId, country } = body;
+    const { appointmentId } = body;
     const currentAppointment =
       await this.appointmentModel.findById(appointmentId);
 
@@ -48,6 +48,7 @@ export class AppointmentService {
       appointmentId,
       {
         note,
+        description: note.description,
       },
       { new: true },
     );
