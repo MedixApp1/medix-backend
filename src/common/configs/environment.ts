@@ -21,6 +21,9 @@ export interface IEnvironment {
       API_KEY: string;
     };
   };
+  OPENAI: {
+    API_KEY: string;
+  };
   APITOOLKIT: {
     API_KEY: string;
   };
@@ -45,6 +48,9 @@ export const ENVIRONMENT: IEnvironment = {
     GEMINI: {
       API_KEY: process.env.GEMINI_API_KEY,
     },
+  },
+  OPENAI: {
+    API_KEY: process.env.OPENAI_API_KEY,
   },
   APITOOLKIT: {
     API_KEY: process.env.APITOOLKIT_API_KEY,

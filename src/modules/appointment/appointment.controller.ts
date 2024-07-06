@@ -49,7 +49,7 @@ export class AppointmentController {
   // }
 
   @Post('/')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('audio'))
   @ResponseMessage(RESPONSE_CONSTANT.APPOINTMENT.CREATE_APPOINTMENT_SUCCESS)
   async createAppointment(
     @UploadedFile() file: Express.Multer.File,

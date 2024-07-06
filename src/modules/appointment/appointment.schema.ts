@@ -9,8 +9,11 @@ export class Appointment {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user: User;
 
-  @Prop({ required: true })
+  @Prop({ required: true , unique: false})
   transcript: [string];
+
+  @Prop({ required: true })
+  description: string;
 
   @Prop(
     raw({
@@ -51,6 +54,8 @@ export class Appointment {
     }),
   )
   patientInstructions: Record<string, any>;
+  @Prop({ required: true })
+  duration: number;
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);
