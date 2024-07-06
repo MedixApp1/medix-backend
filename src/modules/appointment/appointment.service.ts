@@ -20,11 +20,12 @@ export class AppointmentService {
   ) {}
   async createAppointment(
     userId: string,
-    file: Express.Multer.File,
+    url: string,
+    mimeType: string,
   ): Promise<Appointment> {
     const transcript = await this.geminiService.generateTranscriptFromAudio(
-      file.buffer,
-      file.mimetype,
+      url,
+      mimeType,
     );
     const newAppointment = await this.appointmentModel.create({
       transcript: transcript,
@@ -65,7 +66,7 @@ export class AppointmentService {
       throw new BadRequestException('Invalid Appointment ID');
     }
     const patientInstructions =
-      await this.geminiService.generatePatientInstructionsFromTranscript(
+      await this.geminiService.generatePatientInstructionsfFromTranscript(
         currentAppointment.transcript.join('/n'),
       );
     console.log(patientInstructions);
